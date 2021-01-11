@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,9 +18,13 @@ public class WordAdapter extends RecyclerView.Adapter<WordAdapter.WordViewHolder
     //1. Añadir una repr>esentación de los datos
     private List<String> mWordList;
 
+    //Referencia a interface que pasa el objeto
+    private InterfacePasarElemento pasarElemento;
+
     //8. No olvidar crear el constructor para pasar el listado de datos al instanciar el adapter
-    public WordAdapter(List<String> mWordList) {
+    public WordAdapter(List<String> mWordList, InterfacePasarElemento pasarElemento) {
         this.mWordList = mWordList;
+        this.pasarElemento = pasarElemento;
     }
 
     @NonNull
@@ -50,15 +55,32 @@ public class WordAdapter extends RecyclerView.Adapter<WordAdapter.WordViewHolder
 
     //2. Crear clase interna view holder. Representación del objeto que se repite y se muestra
     //Puede esta dentro o fuera de la clase Adapter
-    public class WordViewHolder extends RecyclerView.ViewHolder {
+    public class WordViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener  {
 
         private TextView textView;
 
         public WordViewHolder(@NonNull WordItemListBinding mBinding) {
             super(mBinding.getRoot());
             textView = mBinding.textView;
-            
+            //No olvidar este paso para que funcione el click
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            //Obtener la posición del elemento
+            int position = getLayoutPosition();
+            String seleccionado = mWordList.get(position);
+            mWordList.set(position, seleccionado + " CLICK");
+            notifyDataSetChanged();
+            pasarElemento.passElemento(seleccionado);
         }
     }
+    //INTERFACE CON UN METODO QUE RECIBE EL ELEMENTO Y LO PASA DONDE ESTE IMPLEMENTADA LA INTERFACE
+    //Interface solo declaran metodos no recibe paramentros
+    public interface InterfacePasarElemento{
+        //ESte metdodo pasa el objeto seleccionado
+        void passElemento(String item);
 
+    }
 }
